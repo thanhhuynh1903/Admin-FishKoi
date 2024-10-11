@@ -1,26 +1,16 @@
 import { lazy } from 'react';
-
-// project import
 import Loadable from 'components/Loadable';
-import MinimalLayout from 'layout/MinimalLayout';
+import MinimalLayout from 'layout/MinimalLayout'; // Assuming you have a minimal layout for login pages
 
-// render - login
-const AuthLogin = Loadable(lazy(() => import('pages/authentication/login')));
-const AuthRegister = Loadable(lazy(() => import('pages/authentication/register')));
-
-// ==============================|| AUTH ROUTING ||============================== //
+const AuthLogin = Loadable(lazy(() => import('pages/authentication/login'))); // Path to your AuthLogin component
 
 const LoginRoutes = {
   path: '/',
-  element: <MinimalLayout />,
+  element: <MinimalLayout />, // Use a minimal layout for login
   children: [
     {
-      path: '/login',
+      path: '/',
       element: <AuthLogin />
-    },
-    {
-      path: '/register',
-      element: <AuthRegister />
     }
   ]
 };

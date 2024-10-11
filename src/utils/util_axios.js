@@ -1,7 +1,6 @@
 import axios from "axios";
-import { getCookie } from "./util_cookie";
 
-const MASTER_URL = "https://everfresh-server.onrender.com/api";
+const MASTER_URL = "https://fengshuikoiapi.onrender.com/api";
 
 const axiosInstance = axios.create({
   baseURL: MASTER_URL,
@@ -10,16 +9,19 @@ const axiosInstance = axios.create({
   },
 });
 
-axiosInstance.interceptors.request.use((config) => {
-  const token = getCookie("e_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("e_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+);
 
 export const apost = async (path, data) => {
   try {
