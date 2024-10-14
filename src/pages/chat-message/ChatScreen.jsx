@@ -38,6 +38,12 @@ const ChatScreen = () => {
     }
   }, [fetchedMessages]);
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
+    }  
+  }
+
   // Render chat messages
   const renderMessages = useCallback(() => {
     return messages.map((message) => (
@@ -94,6 +100,7 @@ const ChatScreen = () => {
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
+          onKeyPress={handleKeyPress}
           placeholder="Type your message..."
           style={{
             flexGrow: 1,
