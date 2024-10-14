@@ -28,9 +28,7 @@ const ChatScreen = () => {
 
   // Handle real-time messages using socket
   useSocketMessage((message) => {
-    if (message.senderId === receiverId || message.receiverId === receiverId) {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    }
+    setMessages((prevMessages) => [...prevMessages, message]);
   });
 
   // Update messages when fetched from the server

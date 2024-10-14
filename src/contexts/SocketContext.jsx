@@ -11,13 +11,15 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     const newSocket = io('https://fengshuikoiapi.onrender.com', {
       query: { userId: userId },
+      reconnectionAttempts: 5, // Attempt to reconnect 5 times if disconnected
+      reconnectionDelay: 2000, // Wait 2 seconds before trying to reconnect
     });
     setSocket(newSocket);
 
     return () => {
       newSocket.disconnect();
     };
-  }, []);
+  }, [userId]);
 
   return (
     <SocketContext.Provider value={socket}>
