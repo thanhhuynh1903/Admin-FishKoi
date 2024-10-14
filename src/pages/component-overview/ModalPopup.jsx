@@ -71,7 +71,7 @@ const ModalPopup = ({ blog, onDelete }) => {
             onClick={handleOpenModal}
             sx={{ cursor: 'pointer', mb: 1 }}
           >
-            <Link className="edit-link">
+            <Link to={`/blogdetail/${blog._id}`} className="edit-link">
               View detail blog
             </Link>
           </Typography>

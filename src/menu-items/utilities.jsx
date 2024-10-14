@@ -33,14 +33,14 @@ const utilities = {
       id: 'util-typography',
       title: 'Users',
       type: 'item',
-      url: '/typography',
+      url: '/users',
       icon: icons.UserAddOutlined
     },
     {
       id: 'util-color',
       title: 'Blogs',
       type: 'item',
-      url: '/color',
+      url: '/blog',
       icon: icons.SnippetsOutlined
     },
     {

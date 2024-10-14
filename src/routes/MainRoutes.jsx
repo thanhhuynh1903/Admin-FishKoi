@@ -3,6 +3,7 @@ import { lazy } from 'react';
 // project import
 import Loadable from 'components/Loadable';
 import Dashboard from 'layout/Dashboard';
+import BlogDetail from 'pages/BlogDetail/BlogDetail';
 
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
 const Typography = Loadable(lazy(() => import('pages/component-overview/typography')));
@@ -23,7 +24,7 @@ const MainRoutes = {
       element: <DashboardDefault />
     },
     {
-      path: 'color',
+      path: 'blog',
       element: <Color />
     },
     {
@@ -44,8 +45,12 @@ const MainRoutes = {
       element: <Shadow />
     },
     {
-      path: 'typography',
+      path: 'users',
       element: <Typography />
+    },
+    {
+      path: 'blogdetail/:id',
+      element: <BlogDetail />
     }
   ]
 };

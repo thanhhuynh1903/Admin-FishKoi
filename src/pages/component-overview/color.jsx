@@ -47,9 +47,12 @@ export default function ComponentColor() {
                 action={
                   <ModalPopup blog={item} onDelete={handleDelete} />
                 }
-                title={item.title}
+                title={"Alex xansdera"}
                 subheader={`${formatDate(item.createdAt)} Update: ${formatDate(item.updatedAt)}`}
               />
+              <Typography variant="body2" sx={{ color: 'text.secondary',marginLeft:2,marginBottom:1 }}>
+                  {item.title}
+                </Typography>
               <CardMedia component="img" height="194" image={item.picture} alt="Paella dish" />
               <CardContent>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
