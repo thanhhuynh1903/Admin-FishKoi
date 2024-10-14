@@ -3,6 +3,7 @@ import { lazy } from 'react';
 // project import
 import Loadable from 'components/Loadable';
 import Dashboard from 'layout/Dashboard';
+import ChatScreen from 'pages/chat-message/ChatScreen';
 import BlogDetail from 'pages/BlogDetail/BlogDetail';
 
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
@@ -38,7 +39,7 @@ const MainRoutes = {
     },
     {
       path: 'sample-page',
-      element: <SamplePage />
+      element: <ChatScreen />
     },
     {
       path: 'shadow',

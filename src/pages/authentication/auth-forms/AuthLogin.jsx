@@ -48,6 +48,7 @@ const AuthLogin = ({ isDemo = false }) => {
       if (res) {
         if (res?.user?.role === 'admin') {
           localStorage.setItem('e_token', res?.accessToken);
+          localStorage.setItem('userId', res?.user?.id);
           navigate('/dashboard/default');
 
           return;
