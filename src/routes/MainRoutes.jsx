@@ -42,7 +42,7 @@ const MainRoutes = {
       element: <ChatScreen />
     },
     {
-      path: 'shadow',
+      path: 'ponds',
       element: <Shadow />
     },
     {
@@ -52,6 +52,10 @@ const MainRoutes = {
     {
       path: 'blogdetail/:id',
       element: <BlogDetail />
+    },
+    {
+      path: 'consultation',
+      element: <div></div>
     }
   ]
 };

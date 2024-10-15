@@ -7,7 +7,8 @@ import {
   FontSizeOutlined,
   LoadingOutlined,
   UserAddOutlined,
-  SnippetsOutlined
+  SnippetsOutlined,
+  WechatOutlined,
 } from '@ant-design/icons';
 
 // icons
@@ -19,7 +20,8 @@ const icons = {
   LoadingOutlined,
   AppstoreAddOutlined,
   UserAddOutlined,
-  SnippetsOutlined
+  SnippetsOutlined,
+  WechatOutlined 
 };
 
 // ==============================|| MENU ITEMS - UTILITIES ||============================== //
@@ -45,10 +47,17 @@ const utilities = {
     },
     {
       id: 'util-shadow',
-      title: 'Shadow',
+      title: 'Ponds',
       type: 'item',
-      url: '/shadow',
+      url: '/ponds',
       icon: icons.BarcodeOutlined
+    },
+    {
+      id: 'util-consultation',
+      title: 'Consultation',
+      type: 'item',
+      url: '/consultation',
+      icon: icons.WechatOutlined
     }
   ]
 };

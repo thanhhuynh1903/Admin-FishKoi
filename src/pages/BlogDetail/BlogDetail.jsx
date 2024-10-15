@@ -79,7 +79,7 @@ export default function BlogDetail() {
         </Typography>
         <CardMedia
           component="img"
-          height="194"
+          height="350px"
           image={data.picture}
           alt="Blog post image"
         />
