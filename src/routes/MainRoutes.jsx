@@ -5,6 +5,7 @@ import Loadable from 'components/Loadable';
 import Dashboard from 'layout/Dashboard';
 import ChatScreen from 'pages/chat-message/ChatScreen';
 import BlogDetail from 'pages/BlogDetail/BlogDetail';
+import Consultation from 'pages/component-overview/Consultation';
 
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
 const Typography = Loadable(lazy(() => import('pages/component-overview/typography')));
@@ -55,7 +56,7 @@ const MainRoutes = {
     },
     {
       path: 'consultation',
-      element: <div></div>
+      element: <Consultation/>
     }
   ]
 };

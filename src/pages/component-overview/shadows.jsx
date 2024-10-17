@@ -100,7 +100,8 @@ export default function ComponentShadow() {
 
   return (
     <ComponentSkeleton>
-      <ComponentWrapper>
+      <h2>Pond</h2>
+      <ComponentWrapper sx={{padding:0}}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <MainCard title="Basic Shadow">

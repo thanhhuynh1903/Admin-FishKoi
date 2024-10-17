@@ -11,8 +11,7 @@ import Drawer from './Drawer';
 import Header from './Header';
 import navigation from 'menu-items';
 import Loader from 'components/Loader';
-import Breadcrumbs from 'components/@extended/Breadcrumbs';
-
+import CustomSeparator from 'components/@extended/CustomSeparator';
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 
 // ==============================|| MAIN LAYOUT ||============================== //
@@ -34,7 +33,7 @@ export default function DashboardLayout() {
       <Drawer />
       <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
         <Toolbar />
-        <Breadcrumbs navigation={navigation} title />
+        <CustomSeparator navigation={navigation} title />
         <Outlet />
       </Box>
     </Box>

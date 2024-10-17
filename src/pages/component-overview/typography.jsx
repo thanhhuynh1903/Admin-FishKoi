@@ -45,10 +45,7 @@ export default function ComponentTypography() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetchApi();
-  }, []);
-
-  const fetchApi = async () => {
+      const fetchApi = async () => {
     try {
       const res = await aget('/user/allUsers');
       const users = res.data.map((user) => ({
@@ -64,9 +61,14 @@ export default function ComponentTypography() {
       console.error('Failed to fetch data:', error);
     }
   };
+    fetchApi();
+  }, []);
+
+
 
   return (
     <ComponentSkeleton>
+      <h2>User</h2>
       <Paper sx={{ height: 400, width: '100%' }}>
         <DataGrid
           rows={data}
