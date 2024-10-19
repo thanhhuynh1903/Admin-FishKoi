@@ -2,12 +2,6 @@ import { useEffect, useState } from 'react';
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid';
 import { aget, adelete } from 'utils/util_axios';
-import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
-import WaterDropIcon from '@mui/icons-material/WaterDrop';
-import IronIcon from '@mui/icons-material/Iron';
-import GrassIcon from '@mui/icons-material/Grass';
-import PublicIcon from '@mui/icons-material/Public';
-import Button from '@mui/material/Button';
 import ComponentSkeleton from './ComponentSkeleton';
 import Modalcreate from './Consultation-components/Modalcreate';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
@@ -17,46 +11,14 @@ import Typography from '@mui/material/Typography'; // Ensure correct import
 const columns = (fetchApi) => [
   { field: 'id', headerName: 'ID', width: 200 },
   {
-    field: 'element',
-    headerName: 'Element',
+    field: 'name',
+    headerName: 'name',
     width: 200,
-    renderCell: (params) => {
-      let Icon;
-      let color;
 
-      switch (params.value) {
-        case 'Fire':
-          Icon = <LocalFireDepartmentIcon color="error" />;
-          color = '#ff4d4f';
-          break;
-        case 'Metal':
-          Icon = <IronIcon color="secondary" />;
-          color = '#8c8c8c';
-          break;
-        case 'Water':
-          Icon = <WaterDropIcon color="primary" />;
-          color = '#1677ff';
-          break;
-        case 'Wood':
-          Icon = <GrassIcon color="success" />;
-          color = '#90d96c';
-          break;
-        default:
-          Icon = <PublicIcon color="info" />;
-          color = '#43cece';
-          break;
-      }
-
-      return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: 'bold' }}>
-          {Icon}
-          <span style={{ color: color }}>{params.value}</span>
-        </div>
-      );
-    }
   },
-  { field: 'suitableColors', headerName: 'Suitable Colors', width: 300 },
-  { field: 'fishPondPlacement', headerName: 'Fish Pond Placement', width: 250 },
+  { field: 'price', headerName: 'price', width: 200 },
+  { field: 'date', headerName: 'date', width: 200 },
+  { field: 'description', headerName: 'description', width: 250 },
   {
     field: 'Action',
     headerName: '',
@@ -65,11 +27,11 @@ const columns = (fetchApi) => [
         console.log(params.id);
         
       const handleDeleteConsul = async () => {
-        const confirmed = window.confirm('Are you sure you want to delete this consultation?');
+        const confirmed = window.confirm('Are you sure you want to delete this package?');
         if (!confirmed) return; // Cancel deletion if the user does not confirm
 
         try {
-          await adelete(`/consultation/delete/${params.id}`); // Use params.row.id
+          await adelete(`/package/delete/${params.id}`); // Use params.row.id
           fetchApi(); // Refresh the data after deletion
         } catch (error) {
           console.error('Failed to delete consultation:', error);
@@ -81,7 +43,7 @@ const columns = (fetchApi) => [
           <span style={{ cursor: 'pointer', marginX: 1 }}>
             <ModeEditOutlineOutlinedIcon sx={{ cursor: 'pointer', marginX: 1 }} />
           </span>
-          <span onClick={handleDeleteConsul} style={{ cursor: 'pointer', marginX: 1 }}>
+          <span  onClick={handleDeleteConsul} style={{ cursor: 'pointer', marginX: 1 }}>
             <DeleteForeverOutlinedIcon />
           </span>
         </div>
@@ -92,7 +54,7 @@ const columns = (fetchApi) => [
 
 const paginationModel = { page: 0, pageSize: 5 };
 
-export default function Consultation() {
+export default function Package() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -101,17 +63,16 @@ export default function Consultation() {
 
   const fetchApi = async () => {
     try {
-      const res = await aget('/consultation');
-      const consuldata = res.data.map((consul) => ({
-        id: consul._id,
-        element: consul.element,
-        suitableColors: consul.suitableColors.join(','),
-        meaning: consul.meaning,
-        fishPondPlacement: consul.fishPondPlacement,
-        limitations: consul.limitations,
-        note: consul.note
+      const res = await aget('/package');
+      const packagedata = res.data.map((pack) => ({
+        id: pack._id,
+        name: pack.name,
+        price: pack.price,
+        date: pack.createdAt,
+        description: pack.description,
+        
       }));
-      setData(consuldata);
+      setData(packagedata);
     } catch (error) {
       console.error('Failed to fetch data:', error);
     }
@@ -120,7 +81,7 @@ export default function Consultation() {
   return (
     <ComponentSkeleton>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Consultation</h2>
+        <h2>Package</h2>
         <Modalcreate refresh={fetchApi} />
       </div>
 
