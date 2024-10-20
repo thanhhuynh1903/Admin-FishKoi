@@ -8,41 +8,40 @@ import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutl
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import Typography from '@mui/material/Typography'; // Ensure correct import
 import ModalEdit from './ModalEdit';
+
 const columns = (fetchApi) => [
   { field: 'id', headerName: 'ID', width: 200 },
+  { field: 'sellerId', headerName: 'Seller Id', width: 250 },
   {
-    field: 'name',
-    headerName: 'name',
-    width: 200,
-
+    field: 'title',
+    headerName: 'Title',
+    width: 200
   },
-  { field: 'price', headerName: 'price', width: 200 },
-  { field: 'date', headerName: 'date', width: 200 },
-  { field: 'description', headerName: 'description', width: 250 },
+  { field: 'price', headerName: 'Price', width: 200 },
+  { field: 'fengShuiTags', headerName: 'Tags', width: 200 },
   {
     field: 'Action',
     headerName: '',
     width: 150,
     renderCell: (params) => {
-        
       const handleDeleteConsul = async () => {
-        const confirmed = window.confirm('Are you sure you want to delete this package?');
+        const confirmed = window.confirm('Are you sure you want to delete this advertisement?');
         if (!confirmed) return; // Cancel deletion if the user does not confirm
 
         try {
-          await adelete(`/package/delete/${params.id}`); // Use params.row.id
-          fetchApi(); // Refresh the data after deletion
+          await adelete(`/advertisement/${params.id}`); // Use params.id
+          await fetchApi(); // Refresh the data after deletion
         } catch (error) {
-          console.error('Failed to delete consultation:', error);
+          console.error('Failed to delete advertisement:', error);
         }
       };
 
       return (
         <div style={{ zIndex: 10, textAlign: 'end' }}>
           <span style={{ cursor: 'pointer', marginX: 1 }}>
-            <ModalEdit statuid={params.id} nameapi={"package"} refresh={fetchApi}/>
+            <ModalEdit statuid={params.id} nameapi={'advertisement'} refresh={fetchApi} />
           </span>
-          <span  onClick={handleDeleteConsul} style={{ cursor: 'pointer', marginX: 1 }}>
+          <span onClick={handleDeleteConsul} style={{ cursor: 'pointer', marginX: 1 }}>
             <DeleteForeverOutlinedIcon />
           </span>
         </div>
@@ -53,7 +52,7 @@ const columns = (fetchApi) => [
 
 const paginationModel = { page: 0, pageSize: 5 };
 
-export default function Package() {
+export default function Advertisement() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -62,14 +61,14 @@ export default function Package() {
 
   const fetchApi = async () => {
     try {
-      const res = await aget('/package');
+      const res = await aget('/advertisement');
       const packagedata = res.data.map((pack) => ({
         id: pack._id,
-        name: pack.name,
-        price: pack.price,
-        date: pack.createdAt,
+        title: pack.title,
         description: pack.description,
-        
+        price: pack.price,
+        sellerId: pack.sellerId,
+        fengShuiTags: pack.fengShuiTags
       }));
       setData(packagedata);
     } catch (error) {
@@ -80,7 +79,7 @@ export default function Package() {
   return (
     <ComponentSkeleton>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Package</h2>
+        <h2>Advertisement</h2>
         <Modalcreate refresh={fetchApi} />
       </div>
 

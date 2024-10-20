@@ -44,13 +44,13 @@ export default function BlogDetail() {
       setData(response.data);
       setEditMode(false);
     } catch (error) {
-      console.error("Error updating blog post", error);
+      console.error('Error updating blog post', error);
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUpdatedData(prevState => ({
+    setUpdatedData((prevState) => ({
       ...prevState,
       [name]: value
     }));
@@ -62,30 +62,23 @@ export default function BlogDetail() {
   };
 
   return (
-    <div style={{ width: "100%" }}>
-      <Card sx={{ maxWidth: "700px", margin: "0 auto" }}>
+    <div style={{ width: '100%' }}>
+      <Card sx={{ maxWidth: '700px', margin: '0 auto' }}>
         <CardHeader
           avatar={
             <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
               R
             </Avatar>
           }
-          
           title={data.authorId}
-          subheader={formatDate(data.createdAt) + " " + "Update at :" + " " + formatDate(data.updatedAt)}
+          subheader={formatDate(data.createAt) + ' ' + 'Update at :' + ' ' + formatDate(data.updatedAt)}
         />
-        <Typography sx={{ marginLeft: 2, marginY: 1 }}>
-          {data.title}
-        </Typography>
-        <CardMedia
-          component="img"
-          height="350px"
-          image={data.picture}
-          alt="Blog post image"
-        />
+        <Typography sx={{ marginLeft: 2, marginY: 1 }}>{data.title}</Typography>
+        <CardMedia component="img" height="350px" image={data.picture} alt="Blog post image" />
         <CardContent>
-          <Typography variant="body2" sx={{ color: 'text.secondary' ,fontSize:"18px"}}>
-            <strong>Description : </strong>{data.content}
+          <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '18px' }}>
+            <strong>Description : </strong>
+            {data.content}
           </Typography>
         </CardContent>
         <CardActions disableSpacing>
@@ -113,6 +106,10 @@ export default function BlogDetail() {
             onChange={handleChange}
           />
           <TextField
+            placeholder="Content edit"
+            multiline
+            rows={6}
+            maxRows={6}
             margin="dense"
             name="content"
             label="Content"
@@ -121,7 +118,7 @@ export default function BlogDetail() {
             variant="outlined"
             value={updatedData.content}
             onChange={handleChange}
-            sx={{fontSize:"16px"}}
+            sx={{ fontSize: '16px' }}
           />
           <TextField
             margin="dense"

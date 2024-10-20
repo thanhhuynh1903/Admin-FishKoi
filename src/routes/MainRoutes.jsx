@@ -7,6 +7,8 @@ import ChatScreen from 'pages/chat-message/ChatScreen';
 import BlogDetail from 'pages/BlogDetail/BlogDetail';
 import Consultation from 'pages/component-overview/Consultation';
 import Package from 'pages/component-overview/Package';
+import Advertisement from 'pages/component-overview/Advertisement';
+
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
 const Typography = Loadable(lazy(() => import('pages/component-overview/typography')));
 const Shadow = Loadable(lazy(() => import('pages/component-overview/shadows')));
@@ -61,6 +63,10 @@ const MainRoutes = {
     {
       path: 'package',
       element: <Package/>
+    },
+    {
+      path: 'advertisement',
+      element: <Advertisement/>
     }
   ]
 };

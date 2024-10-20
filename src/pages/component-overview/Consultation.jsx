@@ -13,7 +13,7 @@ import Modalcreate from './Consultation-components/Modalcreate';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import Typography from '@mui/material/Typography'; // Ensure correct import
-
+import ModalEdit from './ModalEdit';
 const columns = (fetchApi) => [
   { field: 'id', headerName: 'ID', width: 200 },
   {

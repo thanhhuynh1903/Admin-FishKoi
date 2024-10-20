@@ -11,6 +11,8 @@ import {
   WechatOutlined,
 } from '@ant-design/icons';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import CardGiftcardOutlinedIcon from '@mui/icons-material/CardGiftcardOutlined';
+
 // icons
 const icons = {
   FontSizeOutlined,
@@ -65,6 +67,13 @@ const utilities = {
       type: 'item',
       url: '/package',
       icon: Inventory2OutlinedIcon
+    },
+    {
+      id: 'util-advertisement',
+      title: 'Advertisement',
+      type: 'item',
+      url: '/advertisement',
+      icon: CardGiftcardOutlinedIcon
     }
   ]
 };

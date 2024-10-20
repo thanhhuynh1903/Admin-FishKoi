@@ -16,6 +16,14 @@ import BasicPagination from './BasicPagination';
 
 const ITEMS_PER_PAGE = 6;
 
+const EllipsisTypography = styled(Typography)({
+  display: '-webkit-box',
+  overflow: 'hidden',
+  WebkitBoxOrient: 'vertical',
+  WebkitLineClamp: 3, // Change this to the number of lines you want to display before truncating
+  textOverflow: 'ellipsis'
+});
+
 export default function ComponentColor() {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
@@ -58,16 +66,16 @@ export default function ComponentColor() {
                 }
                 action={<ModalPopup blog={item} onDelete={handleDelete} />}
                 title={"Alex xansdera"}
-                subheader={`${formatDate(item.createdAt)} Update: ${formatDate(item.updatedAt)}`}
+                subheader={`${formatDate(item.createAt)} Update: ${formatDate(item.updatedAt)}`}
               />
               <Typography variant="body2" sx={{ color: 'text.secondary', marginLeft: 2, marginBottom: 1 }}>
                 {item.title}
               </Typography>
               <CardMedia component="img" height="194" image={item.picture} alt="Paella dish" />
               <CardContent>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                <EllipsisTypography variant="body2" sx={{ color: 'text.secondary' }}>
                   {item.content}
-                </Typography>
+                </EllipsisTypography>
               </CardContent>
             </Card>
           </Grid>

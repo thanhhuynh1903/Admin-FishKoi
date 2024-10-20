@@ -57,7 +57,7 @@ function ShadowBox({ shadow, data }) {
           <strong>element:</strong> {data.element}
         </Typography>
         <Typography variant="h6">
-          <strong>DOB:</strong> {data.birthYear}
+          <strong>Year:</strong> {data.birthYear}
         </Typography>
       </Stack>
     </HoverShadowCard>
