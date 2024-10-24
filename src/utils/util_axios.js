@@ -49,6 +49,30 @@ export const apostfile = async (path, selectedFile, dataObject) => {
   }
 };
 
+
+export const postBlogPost = async (path, { title, picture, content, authorId }) => {
+  const formData = new FormData();
+  
+  // Append fields to formData
+  formData.append('title', title);
+  formData.append('content', content);
+  formData.append('authorId', authorId);
+  if (picture) {
+    formData.append('picture', picture); // Append the file if it exists
+  }
+
+  try {
+    const response = await axiosInstance.post(path, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data; // Return response data
+  } catch (error) {
+    throw error; // Propagate error
+  }
+};
+
 export const aget = async (path) => {
   try {
     const response = await axiosInstance.get(path);
@@ -70,6 +94,14 @@ export const adelete = async (path) => {
 export const aupdate = async (path, data) => {
   try {
     const response = await axiosInstance.put(path, data);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+export const apatch = async (path, data) => {
+  try {
+    const response = await axiosInstance.patch(path, data);
     return response;
   } catch (error) {
     throw error;

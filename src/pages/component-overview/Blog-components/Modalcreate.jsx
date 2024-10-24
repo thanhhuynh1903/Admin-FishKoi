@@ -9,8 +9,8 @@ import { borderRadius, styled } from '@mui/system';
 import clsx from 'clsx';
 import Grid from '@mui/material/Grid';
 import { TextareaAutosize as BaseTextareaAutosize } from '@mui/base/TextareaAutosize';
-import { apost } from 'utils/util_axios';
-import { useState, useEffect } from 'react';
+import { postBlogPost } from 'utils/util_axios';
+import { useState, useEffect,useRef  } from 'react';
 import { TextField } from '@mui/material';
 
 const Label = styled(({ children, className }) => {
@@ -136,13 +136,46 @@ const Textarea = styled(BaseTextareaAutosize)(
   `
 );
 
+const StyledUploadBox = styled('div')(({ theme }) => `
+  border: 2px dashed ${grey[300]};
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: ${blue[400]};
+    background-color: ${grey[50]};
+  }
+
+  &.dragover {
+    border-color: ${blue[500]};
+    background-color: ${blue[100]};
+  }
+`);
+
+const StyledFileInput = styled('input')`
+  display: none;
+`;
+
+const ImagePreview = styled('img')`
+  max-width: 100%;
+  max-height: 200px;
+  margin-top: 10px;
+  border-radius: 4px;
+`;
+
 export default function Modalcreate({ refresh }) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    description: ''
+    title: '',
+    content: '',
+    authorId: '60d0fe4f5311236168a109ca',
+    picture: null // Changed to null since we'll store the file object
   });
+  const [previewUrl, setPreviewUrl] = useState('');
+  const fileInputRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -152,30 +185,88 @@ export default function Modalcreate({ refresh }) {
     }));
   };
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prevState) => ({
+        ...prevState,
+        picture: file
+      }));
+      
+      // Create preview URL
+      const fileUrl = URL.createObjectURL(file);
+      setPreviewUrl(fileUrl);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.currentTarget.classList.add('dragover');
+  };
+
+  const handleDragLeave = (e) => {
+    e.currentTarget.classList.remove('dragover');
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      setFormData((prevState) => ({
+        ...prevState,
+        picture: file
+      }));
+      
+      const fileUrl = URL.createObjectURL(file);
+      setPreviewUrl(fileUrl);
+    }
+  };
 
   const handleSubmit = async () => {
+    const { title, content, authorId, picture } = formData;
+
     try {
-      const response = await apost('/package/create', {
-        name: formData.name,
-        price: formData.price, // Assuming suitableColors is a comma-separated string
-        description: formData.description
-      });
+      // Using postBlogPost function to send the file along with other data
+      const response = await postBlogPost('/blog', { title, content, authorId, picture });
+      console.log('Response:', response); // Updated to directly log response
       refresh();
-      console.log('Response:', response.data);
-      // Handle success, e.g., close modal, show success message, etc.
       setOpen(false);
     } catch (error) {
       console.error('Error submitting form:', error);
-      // Handle error, e.g., show error message, etc.
+    }
+
+  };
+
+  const handleOpen = () => setOpen(true);
+  
+  const handleClose = () => {
+    setOpen(false);
+    setFormData({
+      title: '',
+      content: '',
+      authorId: '60d0fe4f5311236168a109ca',
+      picture: null
+    });
+    setPreviewUrl('');
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
     }
   };
+
+  // Cleanup preview URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   return (
     <div>
       <Button variant="contained" onClick={handleOpen}>
-        {' '}
         + Create
       </Button>
       <Modal
@@ -186,56 +277,58 @@ export default function Modalcreate({ refresh }) {
         sx={{ borderRadius: '20px' }}
       >
         <Box sx={style}>
-          <h2 style={{ textAlign: 'center', marginTop: '0px', marginBottom: '0px' }}>Create new package</h2>
+          <h2 style={{ textAlign: 'center', marginTop: '0px', marginBottom: '0px' }}>
+            Create New Blog Post
+          </h2>
           <FormControl defaultValue="">
-            {/* <Grid container spacing={2}>
-              <Grid item xs={12} md={8}> 
-                <Label>Element</Label>
-                <StyledInput placeholder="Write your element here" />
-                <HelperText />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Label>Suitable Colors</Label>
-                <StyledInput placeholder="Write suitable colors here" />
-                <HelperText />
-              </Grid>
-            </Grid> */}
             <Grid container spacing={2} mt={2}>
-              {' '}
-              {/* Add some margin top for spacing */}
               <Grid item xs={12} sx={{ paddingTop: '0px !important' }}>
-                {' '}
-                {/* Use full width on small screens */}
-                <Label>Name</Label>
+                <Label>Title</Label>
                 <TextField
                   sx={{ width: '100%' }}
-                  name="name"
-                  value={formData.name}
+                  name="title"
+                  value={formData.title}
                   onChange={handleChange}
-                  placeholder="Write your name here"
+                  placeholder="Enter post title"
                 />
                 <HelperText />
               </Grid>
               <Grid item xs={12} sx={{ paddingTop: '0px !important' }}>
-                {' '}
-                {/* Use full width on small screens */}
-                <Label>Price</Label>
-                <TextField
-                  type="number"
-                  sx={{ width: '100%' }}
-                  name="price"
-                  value={formData.price}
-                  onChange={handleChange}
-                  placeholder="Write suitable colors here"
-                />
+                <Label>Image Upload</Label>
+                <StyledUploadBox
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <StyledFileInput
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                  {previewUrl ? (
+                    <div>
+                      <ImagePreview src={previewUrl} alt="Preview" />
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        Click or drag to change image
+                      </Typography>
+                    </div>
+                  ) : (
+                    <Typography>
+                      Drag and drop an image here, or click to select
+                    </Typography>
+                  )}
+                </StyledUploadBox>
                 <HelperText />
               </Grid>
               <Grid item xs={12} sx={{ paddingTop: '0px !important' }}>
-                <Label>Description</Label>
+                <Label>Content</Label>
                 <Textarea
-                  name="description"
+                  sx={{ width: '100%' }}
+                  name="content"
                   aria-label="minimum height"
-                  value={formData.description}
+                  value={formData.content}
                   onChange={handleChange}
                   minRows={3}
                   placeholder="Minimum 3 rows"
@@ -257,3 +350,4 @@ export default function Modalcreate({ refresh }) {
     </div>
   );
 }
+

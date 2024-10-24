@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import CardGiftcardOutlinedIcon from '@mui/icons-material/CardGiftcardOutlined';
-
+import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 // icons
 const icons = {
   FontSizeOutlined,
@@ -74,6 +74,13 @@ const utilities = {
       type: 'item',
       url: '/advertisement',
       icon: CardGiftcardOutlinedIcon
+    },
+    {
+      id: 'util-product',
+      title: 'Product',
+      type: 'item',
+      url: '/products',
+      icon: InventoryOutlinedIcon
     }
   ]
 };

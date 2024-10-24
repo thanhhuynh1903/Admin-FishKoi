@@ -13,7 +13,7 @@ import ComponentSkeleton from './ComponentSkeleton';
 import { aget } from 'utils/util_axios';
 import ModalPopup from './ModalPopup';
 import BasicPagination from './BasicPagination';
-
+import Modalcreate from './Blog-components/Modalcreate';
 const ITEMS_PER_PAGE = 6;
 
 const EllipsisTypography = styled(Typography)({
@@ -30,11 +30,14 @@ export default function ComponentColor() {
   const paginationRef = useRef();
 
   useEffect(() => {
-    aget('/blog').then((res) => {
-      setData(res.data);
-    });
+    fetchApi();
   }, []);
 
+const fetchApi = async () =>{
+    await aget('/blog').then((res) => {
+      setData(res.data);
+    });
+  }
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
     return date.toLocaleDateString();
@@ -53,7 +56,10 @@ export default function ComponentColor() {
 
   return (
     <ComponentSkeleton>
-      <h2>Blog</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Blogs</h2>
+        <Modalcreate refresh={fetchApi} />
+      </div>
       <Grid container spacing={3}>
         {paginatedData.map((item) => (
           <Grid item xs={12} sm={6} md={4} key={item._id}>

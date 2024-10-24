@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { aget, aupdate } from 'utils/util_axios';
+import { aget, aupdate, apatch } from 'utils/util_axios';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -7,6 +7,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export default function ModalEdit({ statuid, nameapi, refresh }) {
   const [data, setData] = useState({});
@@ -36,25 +38,55 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
     }));
   };
 
+  const handleSwitchChange = (e) => {
+    const { name, checked } = e.target;
+    setUpdatedData((prevState) => ({
+      ...prevState,
+      [name]: checked
+    }));
+  };
+
   const handleEditClick = () => {
     setEditMode(true);
   };
 
   const handleUpdate = async () => {
     try {
-      const response = await aupdate(`/${nameapi}/${statuid}`, updatedData);
+      let response;
+      if (nameapi === 'products') {
+        // Check if only isApproved status is updated
+        if ('isApproved' in updatedData) {
+          response = await apatch(`/${nameapi}/${statuid}/approve`, { isApproved: updatedData.isApproved });
+        } else {
+          response = await aupdate(`/${nameapi}/${statuid}`, {
+            name: updatedData.name,
+            description: updatedData.description,
+            price: updatedData.price,
+            image: updatedData.image // assuming imageUrl is part of updatedData
+          });
+        }
+      } else {
+        response = await aupdate(`/${nameapi}/${statuid}`, updatedData);
+      }
       setData(response.data);
       setEditMode(false);
-      refresh();
+      
     } catch (error) {
-      console.error('Error updating blog post', error);
+      console.error('Error updating data', error);
+    }finally{
+      refresh();
     }
   };
-  //   match all field by object key
-  //   const field = Object.keys(data);
+
   let fields;
-  if (nameapi === 'package') {fields = ['name', 'description', 'price'];}
-  else fields = ['title', 'description', 'price','sellerId','fengShuiTags'];
+  if (nameapi === 'package') {
+    fields = ['name', 'description', 'price'];
+  } else if (nameapi === 'products') {
+    fields = ['name', 'description', 'price', 'image', 'owner', 'isApproved', 'avgRating', 'totalReviews'];
+  } else {
+    fields = ['title', 'description', 'price', 'sellerId', 'fengShuiTags'];
+  }
+
   return (
     <span>
       <span onClick={handleEditClick}>
@@ -64,21 +96,53 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
         <DialogTitle>Edit {nameapi}</DialogTitle>
         <DialogContent>
           {fields.map((field) => (
-            <TextField
-              key={field}
-              margin="dense"
-              name={field}
-              label={field.charAt(0).toUpperCase() + field.slice(1)}
-              type={field === 'price' ? 'number' : 'text'}
-              fullWidth
-              variant="outlined"
-              value={updatedData[field] || ''}
-              onChange={handleChange}
-              multiline={field === 'description'}
-              rows={field === 'description' ? 6 : undefined}
-              maxRows={field === 'description' ? 6 : undefined}
-              sx={{ fontSize: '16px' }}
-            />
+            field === 'isApproved' ? (
+              <FormControlLabel
+                key={field}
+                control={
+                  <Switch
+                    checked={updatedData[field] || false}
+                    onChange={handleSwitchChange}
+                    name={field}
+                  />
+                }
+                label="Is Approved"
+              />
+            ) : field === 'avgRating' || field === 'totalReviews' ? (
+              data.avgRating && data.totalReviews ? (
+                <TextField
+                  disabled
+                  key={field}
+                  margin="dense"
+                  name={field}
+                  label={field.charAt(0).toUpperCase() + field.slice(1)}
+                  type="number"
+                  fullWidth
+                  variant="outlined"
+                  value={updatedData[field] || ''}
+                  onChange={handleChange}
+                  sx={{ fontSize: '16px' }}
+                />
+              ) : (
+                <p key={field}>Don't have rating or review</p>
+              )
+            ) : (
+              <TextField
+                key={field}
+                margin="dense"
+                name={field}
+                label={field.charAt(0).toUpperCase() + field.slice(1)}
+                type={field === 'price' ? 'number' : 'text'}
+                fullWidth
+                variant="outlined"
+                value={field === 'owner' ? (updatedData[field]?.name || '') : (updatedData[field] || '')}
+                onChange={handleChange}
+                multiline={field === 'description'}
+                rows={field === 'description' ? 6 : undefined}
+                maxRows={field === 'description' ? 6 : undefined}
+                sx={{ fontSize: '16px' }}
+              />
+            )
           ))}
         </DialogContent>
         <DialogActions>

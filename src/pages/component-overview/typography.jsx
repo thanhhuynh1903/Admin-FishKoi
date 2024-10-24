@@ -18,14 +18,20 @@ const columns = [
   { field: 'name', headerName: 'Name', width: 200 },
   { field: 'email', headerName: 'Email', width: 200 },
   {
+    field: 'posts',
+    headerName: 'Posts',
+    width: 150,
+    renderCell: (params) => (
+      <div style={{ color: params.value > 50 ? 'red' : 'green', fontWeight: 'bold' }}>
+      {params.row.posts?.length > 0 ? params.row.posts.length : 0}
+    </div>
+    )
+  },
+  {
     field: 'age',
     headerName: 'Age',
     width: 140,
-    renderCell: (params) => (
-      <div style={{ color: params.value > 50 ? 'red' : 'green', fontWeight: 'bold' }}>
-        {params.value}
-      </div>
-    )
+    renderCell: (params) => <div style={{ color: params.value > 50 ? 'red' : 'green', fontWeight: 'bold' }}>{params.value}</div>
   },
   {
     field: 'gender',
@@ -45,26 +51,25 @@ export default function ComponentTypography() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-      const fetchApi = async () => {
-    try {
-      const res = await aget('/user/allUsers');
-      const users = res.data.map((user) => ({
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        age: new Date().getFullYear() - user.birthYear,
-        gender: user.gender,
-        role: user.role
-      }));
-      setData(users);
-    } catch (error) {
-      console.error('Failed to fetch data:', error);
-    }
-  };
+    const fetchApi = async () => {
+      try {
+        const res = await aget('/user/allUsers');
+        const users = res.data.map((user) => ({
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          posts: user.posts,
+          age: new Date().getFullYear() - user.birthYear,
+          gender: user.gender,
+          role: user.role
+        }));
+        setData(users);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
     fetchApi();
   }, []);
-
-
 
   return (
     <ComponentSkeleton>
