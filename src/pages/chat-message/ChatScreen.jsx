@@ -88,6 +88,7 @@ const AdminChat = () => {
   const [queueCount, setQueueCount] = useState(0);
   const [users, setUsers] = useState([]);
   const messagesEndRef = useRef(null);
+  const [isMessageSending, setIsMessageSending] = useState(false);
 
   // Fetch all users
   useEffect(() => {
@@ -103,12 +104,36 @@ const AdminChat = () => {
   }, []);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:5000', {
+    // Load active sessions from localStorage
+    const loadStoredSessions = () => {
+      const storedSessions = localStorage.getItem('activeSessions');
+      if (storedSessions) {
+        try {
+          const parsedSessions = new Map(JSON.parse(storedSessions));
+          setActiveSessions(parsedSessions);
+          // If there was a current session, restore it
+          const storedCurrentSession = localStorage.getItem('currentSession');
+          if (storedCurrentSession && parsedSessions.has(storedCurrentSession)) {
+            setCurrentSession(storedCurrentSession);
+          }
+        } catch (error) {
+          console.error('Error parsing stored sessions:', error);
+        }
+      }
+    };
+
+    loadStoredSessions();
+
+    const newSocket = io('https://fengshuikoiapi.onrender.com', {
       query: { userId: ADMIN_ID }
     });
 
     newSocket.on('connect', () => {
-      console.log('Connected to server');
+      console.log('Admin connected to server');
+      // Rejoin all active sessions
+      activeSessions.forEach((session, sessionId) => {
+        newSocket.emit('adminRejoinSession', { sessionId });
+      });
     });
 
     newSocket.on('chatStart', ({ sessionId }) => {
@@ -117,13 +142,15 @@ const AdminChat = () => {
       setActiveSessions(prev => {
         const updated = new Map(prev);
         
-        // Kiểm tra xem user này đã có session active chưa
+        // Check if user already has a session
         const existingSession = Array.from(updated.values()).find(
           session => session.userId === userId
         );
         
         if (!existingSession) {
           updated.set(sessionId, { messages: [], userId: userId });
+          // Store updated sessions
+          localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
         }
         
         return updated;
@@ -133,12 +160,16 @@ const AdminChat = () => {
     newSocket.on('userReconnected', ({ userId, sessionId }) => {
       setActiveSessions(prev => {
         const updated = new Map(prev);
-        // Xóa tất cả session cũ của user này
+        // Update the session ID for the user if needed
         Array.from(updated.entries()).forEach(([key, session]) => {
           if (session.userId === userId && key !== sessionId) {
+            const sessionData = updated.get(key);
             updated.delete(key);
+            updated.set(sessionId, sessionData);
           }
         });
+        // Store updated sessions
+        localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
         return updated;
       });
     });
@@ -148,8 +179,32 @@ const AdminChat = () => {
         const updated = new Map(prev);
         const session = updated.get(sessionId);
         if (session) {
-          session.messages.push({ senderId, message, timestamp });
-          updated.set(sessionId, session);
+          // Check for duplicate messages
+          const messageExists = session.messages.some(m => 
+            (m.senderId === senderId && 
+             m.message === message && 
+             Math.abs(new Date(m.timestamp).getTime() - new Date(timestamp).getTime()) < 1000)
+          );
+          
+          if (!messageExists) {
+            session.messages.push({ senderId, message, timestamp });
+            updated.set(sessionId, session);
+            // Store updated sessions
+            localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
+          }
+        }
+        return updated;
+      });
+    });
+
+    newSocket.on('chatEnd', ({ sessionId }) => {
+      setActiveSessions(prev => {
+        const updated = new Map(prev);
+        updated.delete(sessionId);
+        localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
+        if (currentSession === sessionId) {
+          setCurrentSession(null);
+          localStorage.removeItem('currentSession');
         }
         return updated;
       });
@@ -164,27 +219,21 @@ const AdminChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [currentSession]);
 
+  useEffect(() => {
+    if (currentSession) {
+      localStorage.setItem('currentSession', currentSession);
+    }
+  }, [currentSession]);
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!message.trim() || !currentSession || !socket) return;
+    if (!message.trim() || !currentSession || !socket || isMessageSending) return;
 
     const session = activeSessions.get(currentSession);
     if (!session) return;
 
     try {
-      // Tìm user ID từ danh sách users
-      const user = users.find(u => u._id === session.userId);
-      if (!user) {
-        console.error('User not found');
-        return;
-      }
-
-      // Gửi message qua API
-      await apost(`/messages/send/${user._id}`, {
-        message: message.trim()
-      });
-
-      // Gửi message qua socket
+      setIsMessageSending(true);
       const messageData = {
         sessionId: currentSession,
         senderId: ADMIN_ID,
@@ -192,9 +241,7 @@ const AdminChat = () => {
         timestamp: new Date().toISOString()
       };
 
-      socket.emit('sendMessage', messageData);
-      
-      // Cập nhật UI
+      // Optimistically update UI
       setActiveSessions(prev => {
         const updated = new Map(prev);
         const session = updated.get(currentSession);
@@ -205,9 +252,32 @@ const AdminChat = () => {
         return updated;
       });
 
+      // Send message via API
+      await apost(`/messages/send/${session.userId}`, {
+        message: message.trim()
+      });
+
+      // Send via socket
+      socket.emit('sendMessage', messageData);
+      
       setMessage("");
     } catch (error) {
       console.error('Error sending message:', error);
+      // Rollback optimistic update if failed
+      setActiveSessions(prev => {
+        const updated = new Map(prev);
+        const session = updated.get(currentSession);
+        if (session) {
+          session.messages = session.messages.filter(msg => 
+            msg.timestamp !== messageData.timestamp
+          );
+          updated.set(currentSession, session);
+        }
+        return updated;
+      });
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setIsMessageSending(false);
     }
   };
 
@@ -218,7 +288,7 @@ const AdminChat = () => {
   // Find user name from users array
   const getUserName = (userId) => {
     const user = users.find(u => u._id === userId);
-    return user ? user.name : `User ${userId.slice(0, 8)}...`;
+    return user ? user.name : `Anonymous`;
   };
 
   return (
