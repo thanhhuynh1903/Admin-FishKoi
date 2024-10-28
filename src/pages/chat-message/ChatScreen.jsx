@@ -124,7 +124,7 @@ const AdminChat = () => {
 
     loadStoredSessions();
 
-    const newSocket = io('https://fengshuikoiapi.onrender.com', {
+    const newSocket = io('http://localhost:5000', {
       query: { userId: ADMIN_ID }
     });
 
@@ -136,42 +136,69 @@ const AdminChat = () => {
       });
     });
 
-    newSocket.on('chatStart', ({ sessionId }) => {
+    newSocket.on('chatStart', async ({ sessionId }) => {
       const userId = sessionId.split('_')[2];
       
-      setActiveSessions(prev => {
-        const updated = new Map(prev);
+      try {
+        // Fetch messages history when session starts
+        const response = await aget(`/messages/get/${userId}`);
+        const messageHistory = response.data;
         
-        // Check if user already has a session
-        const existingSession = Array.from(updated.values()).find(
-          session => session.userId === userId
-        );
-        
-        if (!existingSession) {
-          updated.set(sessionId, { messages: [], userId: userId });
-          // Store updated sessions
-          localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
-        }
-        
-        return updated;
-      });
+        setActiveSessions(prev => {
+          const updated = new Map(prev);
+          
+          // Check if user already has a session
+          const existingSession = Array.from(updated.values()).find(
+            session => session.userId === userId
+          );
+          
+          if (!existingSession) {
+            updated.set(sessionId, { 
+              messages: messageHistory, // Include message history
+              userId: userId 
+            });
+            localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
+          }
+          
+          return updated;
+        });
+      } catch (error) {
+        console.error('Error fetching message history:', error);
+        // Still create session even if history fetch fails
+        setActiveSessions(prev => {
+          const updated = new Map(prev);
+          if (!Array.from(updated.values()).find(session => session.userId === userId)) {
+            updated.set(sessionId, { messages: [], userId: userId });
+            localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
+          }
+          return updated;
+        });
+      }
     });
 
-    newSocket.on('userReconnected', ({ userId, sessionId }) => {
-      setActiveSessions(prev => {
-        const updated = new Map(prev);
-        // Update the session ID for the user if needed
-        Array.from(updated.entries()).forEach(([key, session]) => {
-          if (session.userId === userId && key !== sessionId) {
-            const sessionData = updated.get(key);
-            updated.delete(key);
-            updated.set(sessionId, sessionData);
-          }
+    newSocket.on('userReconnected', async ({ userId, sessionId }) => {
+      try {
+        const response = await aget(`/messages/get/${userId}`);
+        const messageHistory = response.data;
+  
+        setActiveSessions(prev => {
+          const updated = new Map(prev);
+          // Update the session ID for the user if needed
+          Array.from(updated.entries()).forEach(([key, session]) => {
+            if (session.userId === userId && key !== sessionId) {
+              updated.delete(key);
+              updated.set(sessionId, {
+                ...session,
+                messages: messageHistory // Update with latest messages
+              });
+            }
+          });
+          localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
+          return updated;
         });
-        // Store updated sessions
-        localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
-        return updated;
-      });
+      } catch (error) {
+        console.error('Error fetching message history:', error);
+      }
     });
 
     newSocket.on('newMessage', ({ sessionId, senderId, message, timestamp }) => {
@@ -282,7 +309,11 @@ const AdminChat = () => {
   };
 
   const formatTime = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString();
+    const date = timestamp.$date ? new Date(timestamp.$date) : new Date(timestamp);
+    return date.toLocaleTimeString('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   // Find user name from users array
@@ -342,7 +373,7 @@ const AdminChat = () => {
                     <Typography>{msg.message}</Typography>
                     <TimeStamp isAdmin={msg.senderId === ADMIN_ID}>
                       <AccessTimeIcon sx={{ fontSize: '0.875rem' }} />
-                      {formatTime(msg.timestamp)}
+                      {formatTime(msg.createdAt || msg.timestamp)}
                     </TimeStamp>
                   </MessageBubble>
                 ))}
