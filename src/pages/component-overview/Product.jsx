@@ -116,9 +116,9 @@ export default function Product() {
 
   return (
     <ComponentSkeleton>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div>
         <h2>Products</h2>
-        <Modalcreate refresh={fetchApi} />
+        
       </div>
 
       <Paper sx={{ height: 400, width: '100%' }}>

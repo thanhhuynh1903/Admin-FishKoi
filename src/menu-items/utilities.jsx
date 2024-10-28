@@ -13,6 +13,7 @@ import {
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import CardGiftcardOutlinedIcon from '@mui/icons-material/CardGiftcardOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
+import OutlinedFlagOutlinedIcon from '@mui/icons-material/OutlinedFlagOutlined';
 // icons
 const icons = {
   FontSizeOutlined,
@@ -81,6 +82,13 @@ const utilities = {
       type: 'item',
       url: '/products',
       icon: InventoryOutlinedIcon
+    },
+    {
+      id: 'util-report',
+      title: 'Report',
+      type: 'item',
+      url: '/report',
+      icon: OutlinedFlagOutlinedIcon
     }
   ]
 };
