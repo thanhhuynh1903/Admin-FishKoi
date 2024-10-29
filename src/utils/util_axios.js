@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const MASTER_URL = "https://fengshuikoiapi.onrender.com/api";
+const MASTER_URL = "http://localhost:5000/api";
 
 const axiosInstance = axios.create({
   baseURL: MASTER_URL,

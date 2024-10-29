@@ -136,69 +136,37 @@ const AdminChat = () => {
       });
     });
 
-    newSocket.on('chatStart', async ({ sessionId }) => {
-      const userId = sessionId.split('_')[2];
-      
-      try {
-        // Fetch messages history when session starts
-        const response = await aget(`/messages/get/${userId}`);
-        const messageHistory = response.data;
-        
-        setActiveSessions(prev => {
-          const updated = new Map(prev);
-          
-          // Check if user already has a session
-          const existingSession = Array.from(updated.values()).find(
-            session => session.userId === userId
-          );
-          
-          if (!existingSession) {
-            updated.set(sessionId, { 
-              messages: messageHistory, // Include message history
-              userId: userId 
-            });
-            localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
-          }
-          
-          return updated;
-        });
-      } catch (error) {
-        console.error('Error fetching message history:', error);
-        // Still create session even if history fetch fails
-        setActiveSessions(prev => {
-          const updated = new Map(prev);
-          if (!Array.from(updated.values()).find(session => session.userId === userId)) {
-            updated.set(sessionId, { messages: [], userId: userId });
-            localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
-          }
-          return updated;
-        });
-      }
+    newSocket.on('chatStart', ({ sessionId }) => {
+      setActiveSessions(prev => {
+        const updated = new Map(prev);
+        if (!updated.has(sessionId)) {
+          updated.set(sessionId, { messages: [], userId: sessionId.split('_')[2] });
+          localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
+        }
+        return updated;
+      });
     });
 
-    newSocket.on('userReconnected', async ({ userId, sessionId }) => {
-      try {
-        const response = await aget(`/messages/get/${userId}`);
-        const messageHistory = response.data;
-  
-        setActiveSessions(prev => {
-          const updated = new Map(prev);
-          // Update the session ID for the user if needed
-          Array.from(updated.entries()).forEach(([key, session]) => {
-            if (session.userId === userId && key !== sessionId) {
-              updated.delete(key);
-              updated.set(sessionId, {
-                ...session,
-                messages: messageHistory // Update with latest messages
-              });
-            }
-          });
-          localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
-          return updated;
-        });
-      } catch (error) {
-        console.error('Error fetching message history:', error);
-      }
+    newSocket.on('newMessage', ({ sessionId, senderId, message, timestamp }) => {
+      setActiveSessions(prev => {
+        const updated = new Map(prev);
+        const session = updated.get(sessionId);
+        if (session) {
+          // Check for duplicate messages
+          const messageExists = session.messages.some(m => 
+            (m.senderId === senderId && 
+             m.message === message && 
+             Math.abs(new Date(m.timestamp).getTime() - new Date(timestamp).getTime()) < 1000)
+          );
+          
+          if (!messageExists) {
+            session.messages.push({ senderId, message, timestamp });
+            updated.set(sessionId, session);
+            localStorage.setItem('activeSessions', JSON.stringify(Array.from(updated.entries())));
+          }
+        }
+        return updated;
+      });
     });
 
     newSocket.on('newMessage', ({ sessionId, senderId, message, timestamp }) => {
@@ -235,6 +203,13 @@ const AdminChat = () => {
         }
         return updated;
       });
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('Admin disconnected from server');
+      if (currentSession) {
+        newSocket.emit('chatEnd', { sessionId: currentSession });
+      }
     });
 
     setSocket(newSocket);
