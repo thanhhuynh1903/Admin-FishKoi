@@ -67,12 +67,12 @@ const fetchApi = async () =>{
               <CardHeader
                 avatar={
                   <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                    R
+                    {item.authorId ? "A" : "C"}
                   </Avatar>
                 }
                 action={<ModalPopup blog={item} onDelete={handleDelete} />}
-                title={"Alex xansdera"}
-                subheader={`${formatDate(item.createAt)} Update: ${formatDate(item.updatedAt)}`}
+                title={item.authorId ? "Admin" : "Customer"}
+                subheader={`Update: ${formatDate(item.updatedAt)}`}
               />
               <Typography variant="body2" sx={{ color: 'text.secondary', marginLeft: 2, marginBottom: 1 }}>
                 {item.title}
@@ -94,5 +94,6 @@ const fetchApi = async () =>{
         onChange={handleChangePage}
       />
     </ComponentSkeleton>
+    
   );
 }

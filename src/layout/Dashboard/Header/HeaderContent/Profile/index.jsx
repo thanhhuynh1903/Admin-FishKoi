@@ -28,7 +28,7 @@ import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
 import SettingOutlined from '@ant-design/icons/SettingOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
 import avatar1 from 'assets/images/users/avatar-1.png';
-
+import { useNavigate } from 'react-router';
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
   return (
@@ -48,6 +48,7 @@ function a11yProps(index) {
 // ==============================|| HEADER CONTENT - PROFILE ||============================== //
 
 export default function Profile() {
+  const navigate = useNavigate();
   const theme = useTheme();
 
   const anchorRef = useRef(null);
@@ -61,6 +62,12 @@ export default function Profile() {
       return;
     }
     setOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/')
   };
 
   const [value, setValue] = useState(0);
@@ -169,7 +176,7 @@ export default function Profile() {
                     </Tabs>
                   </Box>
                   <TabPanel value={value} index={0} dir={theme.direction}>
-                    <ProfileTab />
+                    <ProfileTab logout={handleLogout} />
                   </TabPanel>
                   <TabPanel value={value} index={1} dir={theme.direction}>
                     <SettingTab />

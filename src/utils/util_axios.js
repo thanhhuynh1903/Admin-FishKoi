@@ -99,6 +99,27 @@ export const aupdate = async (path, data) => {
     throw error;
   }
 };
+
+export const aupdateBlog = async (path, data) => {
+  try {
+    // Create the PUT request to the specified path with the provided data
+    const response = await axiosInstance.put(path, data, {
+      headers: {
+        'Content-Type': data instanceof FormData ? 'multipart/form-data' : 'application/json',
+      },
+    });
+
+    // Log the response for debugging
+    console.log('Update response:', response.data);
+    return response.data; // Return the response data directly
+  } catch (error) {
+    console.error('Error during the update request:', error); // Log the error for debugging
+    throw error; // Rethrow the error for handling in the calling function
+  }
+};
+
+
+
 export const apatch = async (path, data) => {
   try {
     const response = await axiosInstance.patch(path, data);

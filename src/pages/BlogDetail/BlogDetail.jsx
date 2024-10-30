@@ -11,9 +11,9 @@ import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { useParams } from 'react-router';
-import { useState, useEffect } from 'react';
-import { aget, aupdate } from 'utils/util_axios';
+import { Navigate, useNavigate, useParams } from 'react-router';
+import { useState, useEffect, useRef } from 'react';
+import { aget, aupdateBlog, adelete } from 'utils/util_axios';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -21,30 +21,99 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
+const StyledFileInput = styled('input')({
+  display: 'none'
+});
+
+const ImagePreview = styled('img')({
+  maxWidth: '100%',
+  maxHeight: '200px',
+  objectFit: 'cover',
+  marginBottom: '8px'
+});
+
+const StyledUploadBox = styled('div')(
+  ({ theme }) => `
+  border: 2px dashed ${grey[300]};
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: ${blue[400]};
+    background-color: ${grey[50]};
+  }
+
+  &.dragover {
+    border-color: ${blue[500]};
+    background-color: ${blue[100]};
+  }
+`
+);
+
+const blue = {
+  100: '#DAECFF',
+  200: '#b6daff',
+  400: '#3399FF',
+  500: '#007FFF',
+  600: '#0072E5',
+  900: '#003A75'
+};
+
+const grey = {
+  50: '#F3F6F9',
+  100: '#E5EAF2',
+  200: '#DAE2ED',
+  300: '#C7D0DD',
+  400: '#B0B8C4',
+  500: '#9DA8B7',
+  600: '#6B7A90',
+  700: '#434D5B',
+  800: '#303740',
+  900: '#1C2025'
+};
+
 export default function BlogDetail() {
   const { id } = useParams();
   const [data, setData] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [updatedData, setUpdatedData] = useState({ title: '', content: '', picture: '' });
+  const [previewUrl, setPreviewUrl] = useState('');
+
+  const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     aget(`/blog/${id}`).then((res) => {
       setData(res.data);
       setUpdatedData({ title: res.data.title, content: res.data.content, picture: res.data.picture });
+      setPreviewUrl(res.data.picture); // Set the initial preview URL to the existing picture
     });
   }, [id]);
 
   const handleEditClick = () => {
     setEditMode(true);
   };
-
+  
   const handleUpdate = async () => {
     try {
-      const response = await aupdate(`/blog/${id}`, updatedData);
-      setData(response.data);
-      setEditMode(false);
+      const formData = new FormData();
+      formData.append('title', updatedData.title);
+      formData.append('content', updatedData.content);
+  
+      // Only append the picture if it has been selected and is an instance of File
+      if (updatedData.picture instanceof File) {
+        formData.append('picture', updatedData.picture);
+        console.log('Selected picture:', updatedData.picture); // Log the file object
+      }
+  
+      const response = await aupdateBlog(`/blog/${id}`, formData);
+      setData(response); // Update the state with the new data
+      setEditMode(false); // Close the edit dialog
     } catch (error) {
-      console.error('Error updating blog post', error);
+      console.error('Error updating blog post:', error); // Improved error logging
     }
   };
 
@@ -54,6 +123,50 @@ export default function BlogDetail() {
       ...prevState,
       [name]: value
     }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUpdatedData((prevState) => ({
+        ...prevState,
+        picture: file
+      }));
+
+      // Create a preview URL
+      const fileUrl = URL.createObjectURL(file);
+      setPreviewUrl(fileUrl);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileChange({ target: { files: [file] } });
+    }
+  };
+
+  const handleDeleteBlog = async () => {
+    try {
+      console.log('Deltet');
+
+      await adelete(`/blog/${id}`);
+      navigate('/blog');
+    } catch (error) {
+      console.error('Failed to delete blog:', error);
+    }
   };
 
   const formatDate = (timestamp) => {
@@ -70,8 +183,8 @@ export default function BlogDetail() {
               R
             </Avatar>
           }
-          title={data.authorId}
-          subheader={formatDate(data.createAt) + ' ' + 'Update at :' + ' ' + formatDate(data.updatedAt)}
+          title={data.authorId ? 'Admin' : 'Customer'}
+          subheader={'Update at :' + ' ' + formatDate(data.updatedAt)}
         />
         <Typography sx={{ marginLeft: 2, marginY: 1 }}>{data.title}</Typography>
         <CardMedia component="img" height="350px" image={data.picture} alt="Blog post image" />
@@ -85,13 +198,13 @@ export default function BlogDetail() {
           <IconButton aria-label="edit" onClick={handleEditClick}>
             <EditNoteIcon />
           </IconButton>
-          <IconButton aria-label="delete">
+          <IconButton aria-label="delete" onClick={handleDeleteBlog}>
             <DeleteForeverIcon />
           </IconButton>
         </CardActions>
       </Card>
 
-      <Dialog open={editMode} onClose={() => setEditMode(false)}>
+      <Dialog open={editMode} onClose={() => setEditMode(false)} sx={{width:"100% !important"}}>
         <DialogTitle>Edit Blog Post</DialogTitle>
         <DialogContent>
           <TextField
@@ -105,6 +218,26 @@ export default function BlogDetail() {
             value={updatedData.title}
             onChange={handleChange}
           />
+
+          <StyledUploadBox
+            onClick={() => fileInputRef.current?.click()}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <StyledFileInput ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} />
+            {previewUrl ? (
+              <div>
+                <ImagePreview src={previewUrl} alt="Preview" />
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  Click or drag to change image
+                </Typography>
+              </div>
+            ) : (
+              <Typography>Drag and drop an image here, or click to select</Typography>
+            )}
+          </StyledUploadBox>
+
           <TextField
             placeholder="Content edit"
             multiline
@@ -119,16 +252,6 @@ export default function BlogDetail() {
             value={updatedData.content}
             onChange={handleChange}
             sx={{ fontSize: '16px' }}
-          />
-          <TextField
-            margin="dense"
-            name="picture"
-            label="Picture URL"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={updatedData.picture}
-            onChange={handleChange}
           />
         </DialogContent>
         <DialogActions>

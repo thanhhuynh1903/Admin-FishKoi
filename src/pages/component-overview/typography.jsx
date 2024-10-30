@@ -20,9 +20,9 @@ const columns = [
   {
     field: 'posts',
     headerName: 'Posts',
-    width: 150,
+    width: 100,
     renderCell: (params) => (
-      <div style={{ color: params.value > 50 ? 'red' : 'green', fontWeight: 'bold' }}>
+      <div style={{ color: params.value > 0 ? 'green': 'red' , fontWeight: 'bold' }}>
       {params.row.posts?.length > 0 ? params.row.posts.length : 0}
     </div>
     )
@@ -30,13 +30,39 @@ const columns = [
   {
     field: 'age',
     headerName: 'Age',
+    width: 100,
+    renderCell: (params) => <div style={{ color: params.value > 100 ? 'red' : 'green', fontWeight: 'bold' }}>{params.value}</div>
+  },
+  {
+    field: 'koiProducts',
+    headerName: 'Koi Products',
+    width: 110,
+    renderCell: (params) => (
+      <div style={{ color: params.row.koiProducts?.length > 0 ? 'green' : 'red', fontWeight: 'bold' }}>
+      {params.row.koiProducts?.length > 0 ? params.row.koiProducts.length : 0}
+    </div>
+    )
+  },
+  {
+    field: 'packages',
+    headerName: 'Package',
+    width: 110,
+    renderCell: (params) => (
+      <div style={{ color: params.row.packages?.length > 0 ? 'green' : 'red', fontWeight: 'bold' }}>
+      {params.row.packages?.length > 0 ? params.row.packages.length : 0}
+    </div>
+    )
+  },
+  {
+    field: 'numberOfPostedRemind',
+    headerName: 'Posted Remind',
     width: 140,
-    renderCell: (params) => <div style={{ color: params.value > 50 ? 'red' : 'green', fontWeight: 'bold' }}>{params.value}</div>
+    renderCell: (params) => <div style={{ color: params.value === 0 ? 'red' : 'green', fontWeight: 'bold' }}>{params.value}</div>
   },
   {
     field: 'gender',
     headerName: 'Gender',
-    width: 140
+    width: 120
   },
   {
     field: 'role',
@@ -61,6 +87,9 @@ export default function ComponentTypography() {
           posts: user.posts,
           age: new Date().getFullYear() - user.birthYear,
           gender: user.gender,
+          koiProducts: user.koiProducts,
+          packages : user.packages,
+          numberOfPostedRemind : user.numberOfPostedRemind,
           role: user.role
         }));
         setData(users);

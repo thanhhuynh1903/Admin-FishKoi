@@ -42,9 +42,7 @@ function CustomSeparator({ navigation, title }) {
   return (
     <Stack spacing={2} sx={{ marginY: 2 }}>
       <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
-        <Link underline="hover" color="inherit" component={RouterLink} to="/dashboard/default">
-          Home
-        </Link>
+        
         {breadcrumbs.map((crumb, index) =>
           crumb.url ? (
             <Link

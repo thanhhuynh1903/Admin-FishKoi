@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid';
-import { aget, adelete } from 'utils/util_axios';
+import { aget, adelete,apatch } from 'utils/util_axios';
 import ComponentSkeleton from './ComponentSkeleton';
 import Modalcreate from './Package-components/ModalcreatePackage';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
@@ -12,7 +12,7 @@ import Avatar from '@mui/material/Avatar';
 import { Switch } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 
-const columns = (fetchApi, handleDeleteProduct) => [
+const columns = (fetchApi, handleDeleteProduct,handleSwitchChange) => [
   { field: 'id', headerName: 'ID', width: 200 },
   {
     field: 'name',
@@ -36,11 +36,12 @@ const columns = (fetchApi, handleDeleteProduct) => [
     field: 'isApproved',
     headerName: 'Is Approved',
     width: 100,
-    
     renderCell: (params) => (
       <div style={{ display: 'flex', justifyContent: 'start', alignItems: 'center' }}>
-        <Switch checked={params.value} />
+        <Switch checked={params.value} onChange={(e) => handleSwitchChange(params.row.id, e.target.checked)} // Call handleSwitchChange
+        />
       </div>
+
     )
   },
   {
@@ -81,6 +82,7 @@ export default function Product() {
         price: pack.price,
         image: pack.image,
         owner: pack.owner,
+        createdAt : pack.createdAt,
         isApproved: pack.isApproved,
         avgRating: pack.avgRating,
         totalReviews: pack.totalReviews
@@ -114,6 +116,24 @@ export default function Product() {
     }
   };
 
+  const handleSwitchChange = async (id, isApproved) => {
+    try {
+      if(isApproved === true) {
+      await apatch(`/products/${id}/approve`, { isApproved });
+      setSnackbarMessage("Approved successfully"); // Get the message from the response
+      setOpen(true); // Open the Snackbar
+      fetchApi(); // Refresh the data after updating
+      }else{
+        return;
+      }
+    } catch (error) {
+      console.error('Failed to update approval status:', error);
+      setSnackbarMessage('Failed to update approval status.'); // Optional error message
+      setOpen(true); // Open the Snackbar for the error message
+    }
+  };
+
+
   return (
     <ComponentSkeleton>
       <div>
@@ -124,7 +144,7 @@ export default function Product() {
       <Paper sx={{ height: 400, width: '100%' }}>
         <DataGrid
           rows={data}
-          columns={columns(fetchApi, handleDeleteProduct)}
+          columns={columns(fetchApi, handleDeleteProduct,handleSwitchChange)}
           initialState={{ pagination: { paginationModel } }}
           pageSizeOptions={[5, 10]}
           sx={{ border: 0, zIndex: 5 }}

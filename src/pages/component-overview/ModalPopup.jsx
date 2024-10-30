@@ -75,12 +75,7 @@ const ModalPopup = ({ blog, onDelete }) => {
               View detail blog
             </Link>
           </Typography>
-          <Typography
-            onClick={handleOpenModal}
-            sx={{ cursor: 'pointer', mb: 1 }}
-          >
-            Edit blog
-          </Typography>
+          
           <hr style={{ borderColor: '#FFF' }} />
           <Typography
             onClick={handleDeleteBlog}

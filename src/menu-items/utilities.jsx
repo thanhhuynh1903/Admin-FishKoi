@@ -48,13 +48,13 @@ const utilities = {
       url: '/blog',
       icon: icons.SnippetsOutlined
     },
-    {
-      id: 'util-shadow',
-      title: 'Ponds',
-      type: 'item',
-      url: '/ponds',
-      icon: icons.BarcodeOutlined
-    },
+    // {
+    //   id: 'util-shadow',
+    //   title: 'Ponds',
+    //   type: 'item',
+    //   url: '/ponds',
+    //   icon: icons.BarcodeOutlined
+    // },
     {
       id: 'util-consultation',
       title: 'Consultation',
@@ -69,13 +69,13 @@ const utilities = {
       url: '/package',
       icon: Inventory2OutlinedIcon
     },
-    {
-      id: 'util-advertisement',
-      title: 'Advertisement',
-      type: 'item',
-      url: '/advertisement',
-      icon: CardGiftcardOutlinedIcon
-    },
+    // {
+    //   id: 'util-advertisement',
+    //   title: 'Advertisement',
+    //   type: 'item',
+    //   url: '/advertisement',
+    //   icon: CardGiftcardOutlinedIcon
+    // },
     {
       id: 'util-product',
       title: 'Product',

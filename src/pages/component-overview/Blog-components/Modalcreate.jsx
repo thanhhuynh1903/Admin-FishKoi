@@ -12,6 +12,7 @@ import { TextareaAutosize as BaseTextareaAutosize } from '@mui/base/TextareaAuto
 import { postBlogPost } from 'utils/util_axios';
 import { useState, useEffect,useRef  } from 'react';
 import { TextField } from '@mui/material';
+import { color } from 'framer-motion';
 
 const Label = styled(({ children, className }) => {
   const formControlContext = useFormControlContext();
@@ -171,7 +172,7 @@ export default function Modalcreate({ refresh }) {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    authorId: '60d0fe4f5311236168a109ca',
+    authorId: localStorage.getItem('userId'),
     picture: null // Changed to null since we'll store the file object
   });
   const [previewUrl, setPreviewUrl] = useState('');
@@ -226,7 +227,10 @@ export default function Modalcreate({ refresh }) {
 
   const handleSubmit = async () => {
     const { title, content, authorId, picture } = formData;
-
+    if (!title || !picture) {
+      alert('Please fill in all required fields.');
+      return;
+    }
     try {
       // Using postBlogPost function to send the file along with other data
       const response = await postBlogPost('/blog', { title, content, authorId, picture });
@@ -283,18 +287,20 @@ export default function Modalcreate({ refresh }) {
           <FormControl defaultValue="">
             <Grid container spacing={2} mt={2}>
               <Grid item xs={12} sx={{ paddingTop: '0px !important' }}>
-                <Label>Title</Label>
+                <Label>Title*{" "}</Label>
                 <TextField
                   sx={{ width: '100%' }}
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
                   placeholder="Enter post title"
+                  fullWidth
+                  required
                 />
                 <HelperText />
               </Grid>
               <Grid item xs={12} sx={{ paddingTop: '0px !important' }}>
-                <Label>Image Upload</Label>
+                <Label>Image Upload* </Label>
                 <StyledUploadBox
                   onClick={() => fileInputRef.current?.click()}
                   onDragOver={handleDragOver}

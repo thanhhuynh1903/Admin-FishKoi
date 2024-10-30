@@ -82,7 +82,7 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
   if (nameapi === 'package') {
     fields = ['name', 'description', 'price'];
   } else if (nameapi === 'products') {
-    fields = ['name', 'description', 'price', 'image', 'owner', 'isApproved', 'avgRating', 'totalReviews'];
+    fields = ['name', 'description', 'price', 'createdAt' ,'image', 'owner', 'isApproved', 'avgRating', 'totalReviews'];
   } else {
     fields = ['title', 'description', 'price', 'sellerId', 'fengShuiTags'];
   }
@@ -93,7 +93,9 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
         <ModeEditOutlineOutlinedIcon />
       </span>
       <Dialog open={editMode} onClose={() => setEditMode(false)}>
+        {nameapi === 'products' ? <DialogTitle>View detail {nameapi}</DialogTitle> :
         <DialogTitle>Edit {nameapi}</DialogTitle>
+        }
         <DialogContent>
           {fields.map((field) => (
             field === 'isApproved' ? (
@@ -101,8 +103,7 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
                 key={field}
                 control={
                   <Switch
-                    checked={updatedData[field] || false}
-                    onChange={handleSwitchChange}
+                    checked={updatedData[field]}
                     name={field}
                   />
                 }
@@ -126,6 +127,25 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
               ) : (
                 <p key={field}>Don't have rating or review</p>
               )
+            ) : field === 'image' ? (
+              <div key={field} style={{width:"100%"}}>
+                <img 
+                  src={updatedData[field]} 
+                  alt="Product" 
+                  style={{ width: '100%', maxHeight: '50%', objectFit: 'cover' }} 
+                />
+                <TextField
+                  margin="dense"
+                  name={field}
+                  label="Image URL"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  value={updatedData[field] || ''}
+                  onChange={handleChange}
+                  sx={{ fontSize: '16px', marginTop: '10px' }}
+                />
+              </div>
             ) : (
               <TextField
                 key={field}
@@ -145,10 +165,12 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
             )
           ))}
         </DialogContent>
+        {nameapi === 'products' ? "" : 
         <DialogActions>
           <Button onClick={() => setEditMode(false)}>Cancel</Button>
           <Button onClick={handleUpdate}>Update</Button>
         </DialogActions>
+}
       </Dialog>
     </span>
   );

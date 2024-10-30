@@ -114,7 +114,7 @@ export default function ComponentShadow() {
               </Grid>
             </MainCard>
           </Grid>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <MainCard title="Custom Shadow">
               <Grid container spacing={3}>
                 <AnimatedGridItem item xs={6} sm={4} md={3} lg={2}>
@@ -194,7 +194,7 @@ export default function ComponentShadow() {
                 </AnimatedGridItem>
               </Grid>
             </MainCard>
-          </Grid>
+          </Grid> */}
         </Grid>
       </ComponentWrapper>
     </ComponentSkeleton>
