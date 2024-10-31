@@ -118,20 +118,23 @@ export default function Product() {
 
   const handleSwitchChange = async (id, isApproved) => {
     try {
-      if(isApproved === true) {
-      await apatch(`/products/${id}/approve`, { isApproved });
-      setSnackbarMessage("Approved successfully"); // Get the message from the response
-      setOpen(true); // Open the Snackbar
-      fetchApi(); // Refresh the data after updating
-      }else{
+      if (isApproved === true) {
+        const confirmed = window.confirm('Are you sure you want to approve this product?');
+        if (!confirmed) return;
+        await apatch(`/products/${id}/approve`, { isApproved });
+        setSnackbarMessage('Approved successfully');
+        setOpen(true); // Open the Snackbar
+        fetchApi(); // Refresh the data after updating
+      } else {
         return;
       }
     } catch (error) {
       console.error('Failed to update approval status:', error);
-      setSnackbarMessage('Failed to update approval status.'); // Optional error message
+      setSnackbarMessage('Failed to update approval status.');
       setOpen(true); // Open the Snackbar for the error message
     }
   };
+  
 
 
   return (

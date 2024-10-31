@@ -271,7 +271,7 @@ export default function Consultation() {
                       <Grid item xs={12} sx={{ borderBottom: '1px solid #DBE0E4' }}>
                         <Item sx={{ borderRadius: '0px', boxShadow: 0, borderRight: '1px solid #DBE0E4' }}>
                           <Typography gutterBottom variant="subtitle1" component="div" color="rgb(144, 217, 108)">
-                            Số may mắn : ({item?.luckyNumbers?.length})
+                            Số may mắn :
                           </Typography>
                           <Typography component="p" sx={{ marginTop: 1 }}>
                             {item?.luckyNumbers?.map((direction) => direction).join(', ')}
@@ -282,11 +282,24 @@ export default function Consultation() {
                         <Typography variant="subtitle1" component="div" color="#4FB5DD">
                           Màu phong thủy:
                         </Typography>
-                        <Typography variant="body">
+                        <Typography variant="body" sx={{ display: 'flex' }}>
                           <Typography component="span" sx={{ fontWeight: 700, fontSize: '12px' }}>
                             Màu chủ đạo :{' '}
                           </Typography>
-                          {item?.suitableColors?.mainColors?.map((itemchild) => itemchild).join(', ')}
+                          {item?.suitableColors?.mainColors?.map((itemchild) => (
+                            <div style={{ display: 'flex', gap: 3 }}>
+                              <div
+                                style={{
+                                  width: '20px',
+                                  height: '20px',
+                                  borderRadius: '50%',
+                                  backgroundColor: itemchild,
+                                  border: '1px solid #000'
+                                }}
+                              ></div>
+                              <span style={{marginRight:5}}>{itemchild} </span>
+                            </div>
+                          ))}
                         </Typography>
                         {item?.suitableColors?.primary.length > 0 && (
                           <Typography
@@ -379,7 +392,7 @@ export default function Consultation() {
       >
         <Typography sx={{ p: 1 }}>{popoverContent?.info}</Typography>
       </Popover>
-      <Typography sx={{ display: 'flex', textAlign: 'center', alignItems: 'center',justifyContent:'center' }}>
+      <Typography sx={{ display: 'flex', textAlign: 'center', alignItems: 'center', justifyContent: 'center' }}>
         <Typography component="div" sx={{ marginRight: 2 }}>
           {start}-{end} of {totalCount}
         </Typography>

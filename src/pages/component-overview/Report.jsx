@@ -85,11 +85,10 @@ export default function Report() {
           <Card key={report._id} sx={{ marginBottom: 2 }}>
             <Grid container spacing={2}>
               {/* Product Image */}
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={4} sx={{borderRight:'1px solid grey'}}>
                 <CardMedia
-                  sx={{ height: 'fit-content' }}
+                  sx={{ height: 'full',width:'300px',objectFit:'cover' }}
                   component="img"
-                  height="140"
                   image={report.product.image}
                   alt={report.product.name}
                 />

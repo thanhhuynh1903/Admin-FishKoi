@@ -63,8 +63,8 @@ const AuthLogin = ({ isDemo = false }) => {
         navigate('/');
       }
       throw new Error(res.message);
-    } catch (err) {
-      toast.error(err.message);
+    } catch (err) {      
+      toast.error("Only Admin can access this");
       setErrors({ submit: err.message });
       setSubmitting(false);
     }
