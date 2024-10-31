@@ -53,7 +53,7 @@ const columns = (fetchApi, handleDeleteProduct,handleSwitchChange) => [
         <span style={{ cursor: 'pointer', marginX: 1 }}>
           <ModalEdit statuid={params.id} nameapi={'products'} refresh={fetchApi} />
         </span>
-        <span onClick={() => handleDeleteProduct(params.id)} style={{ cursor: 'pointer', marginX: 1 }}>
+        <span onClick={() => handleDeleteProduct(params.id)} style={{ cursor: 'pointer', marginX: 1,display:  params.row.totalReviews > 0 ? 'none' : '' }}>
           <DeleteForeverOutlinedIcon />
         </span>
       </div>

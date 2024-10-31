@@ -126,11 +126,11 @@ export default function Report() {
                       ))}
                     </Select>
                   </Typography>
-                  <Box mt={2}>
+                  {/* <Box mt={2}>
                     <Button variant="contained" color="error" onClick={() => handleDelete(report._id)}>
                       Delete
                     </Button>
-                  </Box>
+                  </Box> */}
                 </CardContent>
               </Grid>
               <Grid sx={{ borderLeft: '1px solid grey' }} item xs={12} sm={3}>

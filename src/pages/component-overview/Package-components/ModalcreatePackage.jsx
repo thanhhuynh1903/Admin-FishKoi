@@ -141,7 +141,8 @@ export default function Modalcreate({ refresh }) {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
-    description: ''
+    description: '',
+    numberOfPosted:'0'
   });
 
   const handleChange = (e) => {
@@ -160,7 +161,8 @@ export default function Modalcreate({ refresh }) {
       const response = await apost('/package/create', {
         name: formData.name,
         price: formData.price, // Assuming suitableColors is a comma-separated string
-        description: formData.description
+        description: formData.description,
+        numberOfPosted: formData.numberOfPosted
       });
       refresh();
       console.log('Response:', response.data);
@@ -239,6 +241,19 @@ export default function Modalcreate({ refresh }) {
                   onChange={handleChange}
                   minRows={3}
                   placeholder="Minimum 3 rows"
+                />
+                <HelperText />
+              </Grid>
+              <Grid item xs={12} sx={{ paddingTop: '0px !important' }}>
+                <Label>Number of posted</Label>
+                <TextField
+                  type="number"
+                  sx={{ width: '100%' }}
+                  name="numberOfPosted"
+                  value={formData.numberOfPosted}
+                  onChange={handleChange}
+                  placeholder="Write suitable colors here"
+                  disabled
                 />
                 <HelperText />
               </Grid>

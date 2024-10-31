@@ -16,9 +16,9 @@ const support = {
   children: [
     {
       id: 'sample-page',
-      title: 'Sample Page',
+      title: 'Support centre',
       type: 'item',
-      url: '/sample-page',
+      url: '/support-centre',
       icon: icons.ChromeOutlined
     },
     // {

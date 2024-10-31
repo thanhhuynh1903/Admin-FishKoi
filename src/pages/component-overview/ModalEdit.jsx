@@ -9,7 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
-
+import PreviewIcon from '@mui/icons-material/Preview';
 export default function ModalEdit({ statuid, nameapi, refresh }) {
   const [data, setData] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -70,10 +70,9 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
       }
       setData(response.data);
       setEditMode(false);
-      
     } catch (error) {
       console.error('Error updating data', error);
-    }finally{
+    } finally {
       refresh();
     }
   };
@@ -82,33 +81,20 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
   if (nameapi === 'package') {
     fields = ['name', 'description', 'price'];
   } else if (nameapi === 'products') {
-    fields = ['name', 'description', 'price', 'createdAt' ,'image', 'owner', 'isApproved', 'avgRating', 'totalReviews'];
+    fields = ['name', 'description', 'price', 'createdAt', 'image', 'owner', 'isApproved', 'avgRating', 'totalReviews'];
   } else {
     fields = ['title', 'description', 'price', 'sellerId', 'fengShuiTags'];
   }
 
   return (
     <span>
-      <span onClick={handleEditClick}>
-        <ModeEditOutlineOutlinedIcon />
-      </span>
+      <span onClick={handleEditClick}>{nameapi === 'products' ? <PreviewIcon /> : <ModeEditOutlineOutlinedIcon />}</span>
       <Dialog open={editMode} onClose={() => setEditMode(false)}>
-        {nameapi === 'products' ? <DialogTitle>View detail {nameapi}</DialogTitle> :
-        <DialogTitle>Edit {nameapi}</DialogTitle>
-        }
+        {nameapi === 'products' ? <DialogTitle>View detail {nameapi}</DialogTitle> : <DialogTitle>Edit {nameapi}</DialogTitle>}
         <DialogContent>
-          {fields.map((field) => (
+          {fields.map((field) =>
             field === 'isApproved' ? (
-              <FormControlLabel
-                key={field}
-                control={
-                  <Switch
-                    checked={updatedData[field]}
-                    name={field}
-                  />
-                }
-                label="Is Approved"
-              />
+              <FormControlLabel key={field} control={<Switch checked={updatedData[field]} name={field} />} label="Is Approved" />
             ) : field === 'avgRating' || field === 'totalReviews' ? (
               data.avgRating && data.totalReviews ? (
                 <TextField
@@ -128,12 +114,8 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
                 <p key={field}>Don't have rating or review</p>
               )
             ) : field === 'image' ? (
-              <div key={field} style={{width:"100%"}}>
-                <img 
-                  src={updatedData[field]} 
-                  alt="Product" 
-                  style={{ width: '100%', maxHeight: '50%', objectFit: 'cover' }} 
-                />
+              <div key={field} style={{ width: '100%' }}>
+                <img src={updatedData[field]} alt="Product" style={{ width: '100%', maxHeight: '50%', objectFit: 'cover' }} />
                 <TextField
                   margin="dense"
                   name={field}
@@ -155,7 +137,7 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
                 type={field === 'price' ? 'number' : 'text'}
                 fullWidth
                 variant="outlined"
-                value={field === 'owner' ? (updatedData[field]?.name || '') : (updatedData[field] || '')}
+                value={field === 'owner' ? updatedData[field]?.name || '' : updatedData[field] || ''}
                 onChange={handleChange}
                 multiline={field === 'description'}
                 rows={field === 'description' ? 6 : undefined}
@@ -163,14 +145,16 @@ export default function ModalEdit({ statuid, nameapi, refresh }) {
                 sx={{ fontSize: '16px' }}
               />
             )
-          ))}
+          )}
         </DialogContent>
-        {nameapi === 'products' ? "" : 
-        <DialogActions>
-          <Button onClick={() => setEditMode(false)}>Cancel</Button>
-          <Button onClick={handleUpdate}>Update</Button>
-        </DialogActions>
-}
+        {nameapi === 'products' ? (
+          ''
+        ) : (
+          <DialogActions>
+            <Button onClick={() => setEditMode(false)}>Cancel</Button>
+            <Button onClick={handleUpdate}>Update</Button>
+          </DialogActions>
+        )}
       </Dialog>
     </span>
   );

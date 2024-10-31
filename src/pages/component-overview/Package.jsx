@@ -16,9 +16,10 @@ const columns = (fetchApi) => [
     width: 200,
 
   },
-  { field: 'price', headerName: 'price', width: 200 },
-  { field: 'date', headerName: 'date', width: 200 },
-  { field: 'description', headerName: 'description', width: 250 },
+  { field: 'price', headerName: 'price', width: 140 },
+  { field: 'date', headerName: 'date', width: 180 },
+  { field: 'numberOfPosted', headerName: 'Number of posted', width: 150 },
+  { field: 'description', headerName: 'description', width: 200 },
   {
     field: 'Action',
     headerName: '',
@@ -42,7 +43,7 @@ const columns = (fetchApi) => [
           <span style={{ cursor: 'pointer', marginX: 1 }}>
             <ModalEdit statuid={params.id} nameapi={"package"} refresh={fetchApi}/>
           </span>
-          <span  onClick={handleDeleteConsul} style={{ cursor: 'pointer', marginX: 1 }}>
+          <span  onClick={handleDeleteConsul} style={{ cursor: 'pointer', marginX: 1,display:  params.row.numberOfPosted > 0 ? 'none' : ''}}>
             <DeleteForeverOutlinedIcon />
           </span>
         </div>
@@ -69,7 +70,7 @@ export default function Package() {
         price: pack.price,
         date: pack.createdAt,
         description: pack.description,
-        
+        numberOfPosted: pack.numberOfPosted
       }));
       setData(packagedata);
     } catch (error) {

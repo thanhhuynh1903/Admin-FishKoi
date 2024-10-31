@@ -42,7 +42,7 @@ const MainRoutes = {
     //   ]
     // },
     {
-      path: 'sample-page',
+      path: 'support-centre',
       element: <ChatScreen />
     },
     // {
